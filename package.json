@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "playwright test",
+    "test:skipbuild": "SKIP_BUILD=1 playwright test"
   },
   "license": "MIT",
   "dependencies": {
@@ -12,5 +14,8 @@
     "next": "latest",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.12.2"
   }
 }
