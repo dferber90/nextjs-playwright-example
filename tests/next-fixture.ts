@@ -1,7 +1,7 @@
 // tests/next-fixture.ts
 import { createServer, Server } from "http";
 import { parse } from "url";
-import { test as base } from "@playwright/test";
+import { Page, test as base } from "@playwright/test";
 import next from "next";
 import path from "path";
 import { AddressInfo } from "net";
@@ -12,6 +12,10 @@ const test = base.extend<{
   port: string;
   requestInterceptor: SetupServerApi;
   rest: typeof rest;
+  enablePreviewMode: (
+    page: Page,
+    base?: string
+  ) => Promise<() => Promise<void>>;
 }>({
   // the port function is the same as before
   port: [
@@ -56,6 +60,26 @@ const test = base.extend<{
     },
   ],
   rest,
+  enablePreviewMode: [
+    async ({ port }, use) => {
+      async function enablePreviewMode(
+        page,
+        base = `http://localhost:${port}`
+      ) {
+        await page.goto(`${base}/api/preview`);
+
+        return async function disablePreviewMode() {
+          await page.goto(`${base}/api/preview?clear`);
+        };
+      }
+
+      await use(enablePreviewMode);
+    },
+    {
+      //@ts-ignore
+      scope: "worker",
+    },
+  ],
 });
 // this "test" can be used in multiple test files,
 // and each of them will get the fixtures.
